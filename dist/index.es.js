@@ -414,7 +414,7 @@ function onClickAnywhere (e) {
 // =
 
 class ContextMenu extends h$1 {
-  constructor ({parent, x, y, right, center, top, withTriangle, roomy, veryRoomy, rounded, noBorders, style, items, fontAwesomeCSSUrl, render}) {
+  constructor ({parent, x, y, right, center, top, withTriangle, roomy, veryRoomy, rounded, noBorders, style, items, css, render}) {
     super();
     this.hasParent = !!parent;
     this.x = x;
@@ -429,7 +429,7 @@ class ContextMenu extends h$1 {
     this.noBorders = noBorders || false;
     this.customStyle = style || undefined;
     this.items = items;
-    this.fontAwesomeCSSUrl = fontAwesomeCSSUrl || '/css/fontawesome.css';
+    this.customCSS = css;
     this.customRender = render;
   }
 
@@ -459,8 +459,8 @@ class ContextMenu extends h$1 {
     if (this.x) style += `left: ${this.x}px; `;
     if (this.y) style += `top: ${this.y}px; `;
     return T`
-      ${this.fontAwesomeCSSUrl ? T`<link rel="stylesheet" href="${this.fontAwesomeCSSUrl}">` : ''}
       <div class="context-menu dropdown ${this.hasParent ? 'has-parent' : ''}" style="${style}">
+        ${this.customCSS ? T`<style>${this.customCSS}</style>` : ''}
         ${this.customRender
           ? this.customRender.call(this)
           : T`
@@ -917,6 +917,219 @@ const gripVertical = (width=13, height=13) => x`
   <svg width=${width} height=${height} aria-hidden="true" focusable="false" data-prefix="fas" data-icon="grip-vertical" class="svg-inline--fa fa-grip-vertical fa-w-10" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><path fill="currentColor" d="M96 32H32C14.33 32 0 46.33 0 64v64c0 17.67 14.33 32 32 32h64c17.67 0 32-14.33 32-32V64c0-17.67-14.33-32-32-32zm0 160H32c-17.67 0-32 14.33-32 32v64c0 17.67 14.33 32 32 32h64c17.67 0 32-14.33 32-32v-64c0-17.67-14.33-32-32-32zm0 160H32c-17.67 0-32 14.33-32 32v64c0 17.67 14.33 32 32 32h64c17.67 0 32-14.33 32-32v-64c0-17.67-14.33-32-32-32zM288 32h-64c-17.67 0-32 14.33-32 32v64c0 17.67 14.33 32 32 32h64c17.67 0 32-14.33 32-32V64c0-17.67-14.33-32-32-32zm0 160h-64c-17.67 0-32 14.33-32 32v64c0 17.67 14.33 32 32 32h64c17.67 0 32-14.33 32-32v-64c0-17.67-14.33-32-32-32zm0 160h-64c-17.67 0-32 14.33-32 32v64c0 17.67 14.33 32 32 32h64c17.67 0 32-14.33 32-32v-64c0-17.67-14.33-32-32-32z"></path></svg>
 `;
 
+const paragraph = (width=13, height=13) => x`
+  <svg width=${width} height=${height} aria-hidden="true" focusable="false" data-prefix="fas" data-icon="paragraph" class="svg-inline--fa fa-paragraph fa-w-14" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path fill="currentColor" d="M448 48v32a16 16 0 0 1-16 16h-48v368a16 16 0 0 1-16 16h-32a16 16 0 0 1-16-16V96h-32v368a16 16 0 0 1-16 16h-32a16 16 0 0 1-16-16V352h-32a160 160 0 0 1 0-320h240a16 16 0 0 1 16 16z"></path></svg>
+`;
+
+const bulletList = (width=13, height=13) => x`
+  <svg width=${width} height=${height} aria-hidden="true" focusable="false" data-prefix="fas" data-icon="list" class="svg-inline--fa fa-list fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M80 368H16a16 16 0 0 0-16 16v64a16 16 0 0 0 16 16h64a16 16 0 0 0 16-16v-64a16 16 0 0 0-16-16zm0-320H16A16 16 0 0 0 0 64v64a16 16 0 0 0 16 16h64a16 16 0 0 0 16-16V64a16 16 0 0 0-16-16zm0 160H16a16 16 0 0 0-16 16v64a16 16 0 0 0 16 16h64a16 16 0 0 0 16-16v-64a16 16 0 0 0-16-16zm416 176H176a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h320a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16zm0-320H176a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h320a16 16 0 0 0 16-16V80a16 16 0 0 0-16-16zm0 160H176a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h320a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16z"></path></svg>
+`;
+
+const numberedList = (width=13, height=13) => x`
+  <svg width=${width} height=${height} aria-hidden="true" focusable="false" data-prefix="fas" data-icon="list-ol" class="svg-inline--fa fa-list-ol fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M61.77 401l17.5-20.15a19.92 19.92 0 0 0 5.07-14.19v-3.31C84.34 356 80.5 352 73 352H16a8 8 0 0 0-8 8v16a8 8 0 0 0 8 8h22.83a157.41 157.41 0 0 0-11 12.31l-5.61 7c-4 5.07-5.25 10.13-2.8 14.88l1.05 1.93c3 5.76 6.29 7.88 12.25 7.88h4.73c10.33 0 15.94 2.44 15.94 9.09 0 4.72-4.2 8.22-14.36 8.22a41.54 41.54 0 0 1-15.47-3.12c-6.49-3.88-11.74-3.5-15.6 3.12l-5.59 9.31c-3.72 6.13-3.19 11.72 2.63 15.94 7.71 4.69 20.38 9.44 37 9.44 34.16 0 48.5-22.75 48.5-44.12-.03-14.38-9.12-29.76-28.73-34.88zM496 224H176a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h320a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16zm0-160H176a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h320a16 16 0 0 0 16-16V80a16 16 0 0 0-16-16zm0 320H176a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h320a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16zM16 160h64a8 8 0 0 0 8-8v-16a8 8 0 0 0-8-8H64V40a8 8 0 0 0-8-8H32a8 8 0 0 0-7.14 4.42l-8 16A8 8 0 0 0 24 64h8v64H16a8 8 0 0 0-8 8v16a8 8 0 0 0 8 8zm-3.91 160H80a8 8 0 0 0 8-8v-16a8 8 0 0 0-8-8H41.32c3.29-10.29 48.34-18.68 48.34-56.44 0-29.06-25-39.56-44.47-39.56-21.36 0-33.8 10-40.46 18.75-4.37 5.59-3 10.84 2.8 15.37l8.58 6.88c5.61 4.56 11 2.47 16.12-2.44a13.44 13.44 0 0 1 9.46-3.84c3.33 0 9.28 1.56 9.28 8.75C51 248.19 0 257.31 0 304.59v4C0 316 5.08 320 12.09 320z"></path></svg>
+`;
+
+const table = (width=13, height=13) => x`
+  <svg width=${width} height=${height} aria-hidden="true" focusable="false" data-prefix="fas" data-icon="table" class="svg-inline--fa fa-table fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M464 32H48C21.49 32 0 53.49 0 80v352c0 26.51 21.49 48 48 48h416c26.51 0 48-21.49 48-48V80c0-26.51-21.49-48-48-48zM224 416H64v-96h160v96zm0-160H64v-96h160v96zm224 160H288v-96h160v96zm0-160H288v-96h160v96z"></path></svg>
+`;
+
+const quote = (width=13, height=13) => x`
+  <svg width=${width} height=${height} aria-hidden="true" focusable="false" data-prefix="fas" data-icon="quote-right" class="svg-inline--fa fa-quote-right fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M464 32H336c-26.5 0-48 21.5-48 48v128c0 26.5 21.5 48 48 48h80v64c0 35.3-28.7 64-64 64h-8c-13.3 0-24 10.7-24 24v48c0 13.3 10.7 24 24 24h8c88.4 0 160-71.6 160-160V80c0-26.5-21.5-48-48-48zm-288 0H48C21.5 32 0 53.5 0 80v128c0 26.5 21.5 48 48 48h80v64c0 35.3-28.7 64-64 64h-8c-13.3 0-24 10.7-24 24v48c0 13.3 10.7 24 24 24h8c88.4 0 160-71.6 160-160V80c0-26.5-21.5-48-48-48z"></path></svg>
+`;
+
+const angleRight = (width=13, height=13) => x`
+  <svg width=${width} height=${height} aria-hidden="true" focusable="false" data-prefix="fas" data-icon="angle-right" class="svg-inline--fa fa-angle-right fa-w-8" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 512"><path fill="currentColor" d="M224.3 273l-136 136c-9.4 9.4-24.6 9.4-33.9 0l-22.6-22.6c-9.4-9.4-9.4-24.6 0-33.9l96.4-96.4-96.4-96.4c-9.4-9.4-9.4-24.6 0-33.9L54.3 103c9.4-9.4 24.6-9.4 33.9 0l136 136c9.5 9.4 9.5 24.6.1 34z"></path></svg>
+`;
+
+const angleLeft = (width=13, height=13) => x`
+  <svg width=${width} height=${height} aria-hidden="true" focusable="false" data-prefix="fas" data-icon="angle-left" class="svg-inline--fa fa-angle-left fa-w-8" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 512"><path fill="currentColor" d="M31.7 239l136-136c9.4-9.4 24.6-9.4 33.9 0l22.6 22.6c9.4 9.4 9.4 24.6 0 33.9L127.9 256l96.4 96.4c9.4 9.4 9.4 24.6 0 33.9L201.7 409c-9.4 9.4-24.6 9.4-33.9 0l-136-136c-9.5-9.4-9.5-24.6-.1-34z"></path></svg>
+`;
+
+class CtznEditorBlockMenu extends h$1 {
+  static get properties () {
+    return {
+      currentTag: {type: String, attribute: 'current-tag'},
+      currentView: {type: String}
+    }
+  }
+
+  constructor () {
+    super();
+    this.currentTag = '';
+    this.currentView = undefined;
+  }
+
+  setCurrentView (view) {
+    this.currentView = view;
+  }
+
+  // rendering
+  // =
+
+  render () {
+    if (this.currentView === 'headings') {
+      return this.renderHeadingsMenu()
+    }
+    if (this.currentView === 'lists') {
+      return this.renderListsMenu()
+    }
+    return T`
+      ${this.renderStyles()}
+      <div class="sticky-heading">
+        Change to...
+      </div>
+      ${this.renderBlockTagOption('p', paragraph(13, 13), 'Text')}
+      ${this.renderChangeViewOption('headings', T`<span class="heading-icon">H</span>`, 'Heading')}
+      ${this.renderChangeViewOption('lists', bulletList(13, 13), 'List')}
+      ${this.renderBlockTagOption('blockquote', quote(13, 13), 'Quote')}
+      ${this.renderBlockTagOption('hr', T`<span class="separator-icon">—</span>`, 'Separator')}
+      ${this.renderBlockTagOption('table', table(13, 13), 'Table')}
+    `
+  }
+
+  renderHeadingsMenu () {
+    return T`
+      ${this.renderStyles()}
+      <div class="sticky-heading">
+        <span class="back" @click=${e => this.setCurrentView(undefined)}>${angleLeft()}</span>
+        Change to heading...
+      </div>
+      ${this.renderBlockTagOption('h1', T`<span class="heading-icon">H1</span>`, 'Heading 1')}
+      ${this.renderBlockTagOption('h2', T`<span class="heading-icon">H2</span>`, 'Heading 2')}
+      ${this.renderBlockTagOption('h3', T`<span class="heading-icon">H3</span>`, 'Heading 3')}
+      ${this.renderBlockTagOption('h4', T`<span class="heading-icon">H4</span>`, 'Heading 4')}
+      ${this.renderBlockTagOption('h5', T`<span class="heading-icon">H5</span>`, 'Heading 5')}
+      ${this.renderBlockTagOption('h6', T`<span class="heading-icon">H6</span>`, 'Heading 6')}
+    `
+  }
+
+  renderListsMenu () {
+    return T`
+      ${this.renderStyles()}
+      <div class="sticky-heading">
+        <span class="back" @click=${e => this.setCurrentView(undefined)}>${angleLeft()}</span>
+        Change to list...
+      </div>
+      ${this.renderBlockTagOption('ul', bulletList(13, 13), 'Bulleted List')}
+      ${this.renderBlockTagOption('ol', numberedList(13, 13), 'Numbered List')}
+    `
+  }
+
+  renderBlockTagOption (tagName, icon, label) {
+    // if (this.currentTag === tagName) return ''
+    const setBlockTag = (tagName) => this.dispatchEvent(new CustomEvent('set-block-tag', {detail: {tagName}, bubbles: true}));
+    return T`
+      <div
+        class="dropdown-item"
+        @click=${() => { destroy(); setBlockTag(tagName); }}
+      >
+        <span class="block-tag-icon">${icon}</span>
+        <span>${label}</span>
+      </div>
+    `
+  }
+
+  renderChangeViewOption (view, icon, label) {
+    return T`
+      <div
+        class="dropdown-item"
+        @click=${() => { this.setCurrentView(view); }}
+      >
+        <span class="block-tag-icon">${icon}</span>
+        <span>${label}</span>
+        <span class="submenu-icon">${angleRight(16, 16)}</span>
+      </div>
+    `
+  }
+
+  renderStyles () {
+    return T`
+      <style>
+        :host {
+          display: block;
+          width: 200px;
+          max-height: 300px;
+          overflow-y: scroll;
+          background: #fff;
+          border: 1px solid #ccd;
+          border-radius: 0.25rem;
+          box-shadow: 0 1px 3px #0001;
+        }
+        .dropdown-item {
+          cursor: pointer;
+          padding: 0.5rem 0.6rem;
+          font-size: 13px;
+          font-weight: 500;
+          border-bottom: 1px solid #dde;
+        }
+        .sticky-heading {
+          position: sticky;
+          top: 0;
+          z-index: 1;
+          display: flex;
+          align-items: center;
+          padding: 0.5rem 0.6rem;
+          border-bottom: 1px solid #dde;
+          color: #556;
+          font-size: 12px;
+          font-weight: bold;
+          background: #f5f5f7;
+        }
+        .sticky-heading .back {
+          display: inline-block;
+          cursor: pointer;
+          padding: 0 0.3rem;
+          margin-left: -0.4rem;
+        }
+        .sticky-heading .back svg {
+          position: relative;
+          top: 1px;
+        }
+        .block-tag-icon {
+          display: inline-block;
+          background: #eeeeef;
+          border-radius: 0.2rem;
+          margin-right: 0.3rem;
+          width: 1.6rem;
+          text-align: center;
+          padding: 0.2rem 0;
+          color: #667;
+        }
+        .dropdown-item:hover {
+          background: #fafafd;
+        }
+        .dropdown-item.selected {
+          background: #e8fce4;
+          color: green;
+        }
+        .dropdown-item.selected .block-tag-icon {
+          color: #098f22;
+          background: #ace2ad;
+        }
+        .block-tag-icon svg {
+          position: relative;
+          top: 1px;
+        }
+        .block-tag-icon .heading-icon {
+          font-size: 12px;
+          font-weight: bold;
+          position: relative;
+          top: -1px;
+        }
+        .submenu-icon {
+          float: right;
+          color: #aab;
+          padding: 0.2rem 0;
+        }
+      </style>
+    `
+  }
+
+  // events
+  // =
+}
+customElements.define('ctzn-editor-block-menu', CtznEditorBlockMenu);
+
 class CtznEditorBlock extends h$1 {
   static get properties () {
     return {
@@ -1031,6 +1244,16 @@ class CtznEditorBlock extends h$1 {
     }
   }
 
+  getFocusedBlock () {
+    if (!this.subBlocks?.length) return undefined
+    for (let block of this.subBlocks) {
+      if (block.isBufferFocused) return block
+      let subFocused = block.getFocusedBlock();
+      if (subFocused) return subFocused
+    }
+    return undefined
+  }
+
   getFocusedSubBlock () {
     return this.subBlocks.find(b => b.isBufferFocused)
   }
@@ -1099,34 +1322,29 @@ class CtznEditorBlock extends h$1 {
     this.dispatchEvent(new Event('state-changed', {bubbles: true}));
   }
 
-  onClickMenu (e) {
+  async onClickMenu (e) {
     e.preventDefault();
     e.stopPropagation();
 
-    const setBlockTag = (tagName) => this.dispatchEvent(new CustomEvent('set-block-tag', {detail: {tagName}, bubbles: true}));
-    create({
+    this.classList.add('is-menu-open');
+    const onSetBlockTag = e => {
+      this.dispatchEvent(new CustomEvent('set-block-tag', {detail: e.detail, bubbles: true}));
+    };
+    await create({
       parent: this.querySelector('.menu-container'),
       x: 0,
       y: 0,
       noBorders: true,
-      items: [
-        {label: 'Text', click: () => setBlockTag('p')},
-        {label: 'H1', click: () => setBlockTag('h1')},
-        {label: 'H2', click: () => setBlockTag('h2')},
-        {label: 'H3', click: () => setBlockTag('h3')},
-        {label: 'H4', click: () => setBlockTag('h4')},
-        {label: 'H5', click: () => setBlockTag('h5')},
-        {label: 'H6', click: () => setBlockTag('h6')},
-        {label: 'Quote', click: () => setBlockTag('blockquote')},
-        '-',
-        {label: 'Bullet List', click: () => setBlockTag('ul')},
-        {label: 'Numbered List', click: () => setBlockTag('ol')},
-        '-',
-        {label: 'Separator', click: () => setBlockTag('hr')},
-        '-',
-        {label: 'Table', click: () => setBlockTag('table')}
-      ]
+      render: () => {
+        return T`
+          <ctzn-editor-block-menu
+            current-tag=${this.definition.tagName}
+            @set-block-tag=${onSetBlockTag}
+          ></ctzn-editor-block-menu>
+        `
+      }
     });
+    this.classList.remove('is-menu-open');
   }
 
   onKeydownBuffer (e) {
@@ -1161,7 +1379,7 @@ class CtznEditorBlock extends h$1 {
   }
 
   onClickBuffer (e) {
-    this.checkIfCursorMoved();
+    this.emitStateChanged();
   }
 
   onInputBuffer (e) {
@@ -1424,7 +1642,7 @@ customElements.define('ctzn-editor-block--li', CtznEditorBlock_LI);
 class CtznEditorToolbar extends h$1 {
   static get properties () {
     return {
-      richTextState: {type: Object}
+      editorState: {type: Object}
     }
   }
 
@@ -1434,7 +1652,7 @@ class CtznEditorToolbar extends h$1 {
 
   constructor () {
     super();
-    this.richTextState = {};
+    this.editorState = {};
     this.TOOLBAR_ITEMS = [
       new ToolbarCtrl_History(-1),
       new ToolbarCtrl_History(1),
@@ -1466,7 +1684,7 @@ class CtznEditorToolbar extends h$1 {
   render () {
     return T`
       <div class="controls">
-        ${c$1(this.TOOLBAR_ITEMS, (item, i) => `${i}-${item.id}`, item => item.render(this.richTextState))}
+        ${c$1(this.TOOLBAR_ITEMS, (item, i) => `${i}-${item.id}`, item => item.render(this.editorState))}
       </div>
     `
   }
@@ -1494,7 +1712,7 @@ class ToolbarCtrl_Separator extends ToolbarCtrl {
   }
 
   render () {
-    return T`<div class="sep">|</div>`
+    return T`<div class="sep"></div>`
   }
 }
 
@@ -1508,8 +1726,24 @@ class ToolbarCtrl_Formatting extends ToolbarCtrl {
     return this.formattingCommand
   }
 
-  render (richTextState) {
-    const pressed = richTextState[this.formattingCommand];
+  checkDisabled (editorState) {
+    if (this.formattingCommand === 'bold') {
+      switch (editorState.currentBlock) {
+        case 'h1':
+        case 'h2':
+        case 'h3':
+        case 'h4':
+        case 'h5':
+        case 'h6':
+          return true
+      }
+    }
+    return false
+  }
+
+  render (editorState) {
+    let disabled = this.checkDisabled(editorState);
+    const pressed = !disabled && editorState[this.formattingCommand];
     const icon = ({
       'bold': bold(),
       'italic': italic(),
@@ -1520,7 +1754,7 @@ class ToolbarCtrl_Formatting extends ToolbarCtrl {
     })[this.formattingCommand] || questionMark();
     return T`
       <div
-        class=${e({btn: true, disabled: this.isDisabled, pressed})}
+        class=${e({btn: true, disabled, pressed})}
         @mousedown=${this.onMousedown.bind(this)}
       >
         ${icon}
@@ -1607,7 +1841,7 @@ class CtznEditor extends h$1 {
   static get properties () {
     return {
       rootBlock: {type: Object},
-      richTextState: {type: Object}
+      editorState: {type: Object}
     }
   }
 
@@ -1621,13 +1855,17 @@ class CtznEditor extends h$1 {
     this.rootBlock = new CtznEditorBlockDefinition({tagName: 'editor', blocks: [
       new CtznEditorBlockDefinition({tagName: 'p', content: ''})
     ]});
-    this.richTextState = {
+    this.editorState = {
       appliedStates: {}
     };
   }
 
-  get toolbar () {
+  get toolbarEl () {
     return this.querySelector('ctzn-editor-toolbar')
+  }
+
+  get rootBlockEl () {
+    return this.querySelector('ctzn-editor-block--editor')
   }
 
   fromHTML (str) {
@@ -1648,7 +1886,7 @@ class CtznEditor extends h$1 {
   render () {
     return T`
       <ctzn-editor-toolbar
-        .richTextState=${this.richTextState}
+        .editorState=${this.editorState}
       ></ctzn-editor-toolbar>
       <ctzn-editor-block--editor
         .definition=${this.rootBlock}
@@ -1661,7 +1899,8 @@ class CtznEditor extends h$1 {
   // =
 
   onEditorStateChanged (e) {
-    this.richTextState = {
+    this.editorState = {
+      currentBlock: this.rootBlockEl.getFocusedBlock()?.definition?.tagName,
       bold: document.queryCommandState('bold'),
       italic: document.queryCommandState('italic'),
       underline: document.queryCommandState('underline'),

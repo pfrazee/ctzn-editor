@@ -4,7 +4,8 @@ import { unsafeHTML } from 'lit/directives/unsafe-html.js'
 import { splitContentAtCursor, getPlainTextCaretOffset, setPlainTextCaretOffset } from '../util.js'
 import * as contextMenu from '../context-menu.js'
 import { CtznEditorBlockDefinition } from '../data-model.js'
-import { gripVertical } from '../icons.js'
+import * as icons from '../icons.js'
+import '../block-menu.js'
 
 export class CtznEditorBlock extends LitElement {
   static get properties () {
@@ -120,6 +121,16 @@ export class CtznEditorBlock extends LitElement {
     }
   }
 
+  getFocusedBlock () {
+    if (!this.subBlocks?.length) return undefined
+    for (let block of this.subBlocks) {
+      if (block.isBufferFocused) return block
+      let subFocused = block.getFocusedBlock()
+      if (subFocused) return subFocused
+    }
+    return undefined
+  }
+
   getFocusedSubBlock () {
     return this.subBlocks.find(b => b.isBufferFocused)
   }
@@ -135,7 +146,7 @@ export class CtznEditorBlock extends LitElement {
     return html`
       <div class="block-wrapper">
         <div class="block-ctrl" @click=${this.onClickMenu}>
-          <span>${gripVertical(14, 14)}</span>
+          <span>${icons.gripVertical(14, 14)}</span>
         </div>
         <div class="menu-container"></div>
         <div class="block-content as-${this.definition.tagName}">${this.renderContent()}</div>
@@ -188,34 +199,29 @@ export class CtznEditorBlock extends LitElement {
     this.dispatchEvent(new Event('state-changed', {bubbles: true}))
   }
 
-  onClickMenu (e) {
+  async onClickMenu (e) {
     e.preventDefault()
     e.stopPropagation()
 
-    const setBlockTag = (tagName) => this.dispatchEvent(new CustomEvent('set-block-tag', {detail: {tagName}, bubbles: true}))
-    contextMenu.create({
+    this.classList.add('is-menu-open')
+    const onSetBlockTag = e => {
+      this.dispatchEvent(new CustomEvent('set-block-tag', {detail: e.detail, bubbles: true}))
+    }
+    await contextMenu.create({
       parent: this.querySelector('.menu-container'),
       x: 0,
       y: 0,
       noBorders: true,
-      items: [
-        {label: 'Text', click: () => setBlockTag('p')},
-        {label: 'H1', click: () => setBlockTag('h1')},
-        {label: 'H2', click: () => setBlockTag('h2')},
-        {label: 'H3', click: () => setBlockTag('h3')},
-        {label: 'H4', click: () => setBlockTag('h4')},
-        {label: 'H5', click: () => setBlockTag('h5')},
-        {label: 'H6', click: () => setBlockTag('h6')},
-        {label: 'Quote', click: () => setBlockTag('blockquote')},
-        '-',
-        {label: 'Bullet List', click: () => setBlockTag('ul')},
-        {label: 'Numbered List', click: () => setBlockTag('ol')},
-        '-',
-        {label: 'Separator', click: () => setBlockTag('hr')},
-        '-',
-        {label: 'Table', click: () => setBlockTag('table')}
-      ]
+      render: () => {
+        return html`
+          <ctzn-editor-block-menu
+            current-tag=${this.definition.tagName}
+            @set-block-tag=${onSetBlockTag}
+          ></ctzn-editor-block-menu>
+        `
+      }
     })
+    this.classList.remove('is-menu-open')
   }
 
   onKeydownBuffer (e) {
@@ -250,7 +256,7 @@ export class CtznEditorBlock extends LitElement {
   }
 
   onClickBuffer (e) {
-    this.checkIfCursorMoved()
+    this.emitStateChanged()
   }
 
   onInputBuffer (e) {

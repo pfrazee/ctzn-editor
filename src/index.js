@@ -9,7 +9,7 @@ export class CtznEditor extends LitElement {
   static get properties () {
     return {
       rootBlock: {type: Object},
-      richTextState: {type: Object}
+      editorState: {type: Object}
     }
   }
 
@@ -23,13 +23,17 @@ export class CtznEditor extends LitElement {
     this.rootBlock = new CtznEditorBlockDefinition({tagName: 'editor', blocks: [
       new CtznEditorBlockDefinition({tagName: 'p', content: ''})
     ]})
-    this.richTextState = {
+    this.editorState = {
       appliedStates: {}
     }
   }
 
-  get toolbar () {
+  get toolbarEl () {
     return this.querySelector('ctzn-editor-toolbar')
+  }
+
+  get rootBlockEl () {
+    return this.querySelector('ctzn-editor-block--editor')
   }
 
   fromHTML (str) {
@@ -50,7 +54,7 @@ export class CtznEditor extends LitElement {
   render () {
     return html`
       <ctzn-editor-toolbar
-        .richTextState=${this.richTextState}
+        .editorState=${this.editorState}
       ></ctzn-editor-toolbar>
       <ctzn-editor-block--editor
         .definition=${this.rootBlock}
@@ -63,7 +67,8 @@ export class CtznEditor extends LitElement {
   // =
 
   onEditorStateChanged (e) {
-    this.richTextState = {
+    this.editorState = {
+      currentBlock: this.rootBlockEl.getFocusedBlock()?.definition?.tagName,
       bold: document.queryCommandState('bold'),
       italic: document.queryCommandState('italic'),
       underline: document.queryCommandState('underline'),

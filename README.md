@@ -16,22 +16,27 @@ This is a blocks-oriented WYSIWYG editor geared towards building user interfaces
 
 - Content
   - All HTML block types
+    - Table
+    - HR
+    - Lists inside lists
+    - Pre
+    - DL
   - All HTML inline formatting
   - All CTZN block types
+  - Handle HTML that's not wrapped at the top level in a block tag
+  - Allow blocks inside blockquote?
+  - Support &lt;kbd&gt;?
+  - Parser handle attributes?
 - Behaviors
   - Popup/hover UIs for configuring elements
   - Copy/paste handling
   - Undo/redo stack
   - Selecting multiple blocks
+  - Drag & drop to rearrange blocks
 - Various
   - Indent/outdent for lists
   - UI aesthetics
-  - Handle HTML that's not wrapped at the top level in a block tag
-  - Allow blocks inside blockquote?
-  - Support &lt;pre&gt;?
-  - Support &lt;dl&gt;?
-  - Support &lt;kbd&gt;?
-  - Parser handle attributes?
+  - Mobile
 
 ## Attributions
 

@@ -6,7 +6,7 @@ import * as icons from './icons.js'
 export class CtznEditorToolbar extends LitElement {
   static get properties () {
     return {
-      richTextState: {type: Object}
+      editorState: {type: Object}
     }
   }
 
@@ -16,7 +16,7 @@ export class CtznEditorToolbar extends LitElement {
 
   constructor () {
     super()
-    this.richTextState = {}
+    this.editorState = {}
     this.TOOLBAR_ITEMS = [
       new ToolbarCtrl_History(-1),
       new ToolbarCtrl_History(1),
@@ -48,7 +48,7 @@ export class CtznEditorToolbar extends LitElement {
   render () {
     return html`
       <div class="controls">
-        ${repeat(this.TOOLBAR_ITEMS, (item, i) => `${i}-${item.id}`, item => item.render(this.richTextState))}
+        ${repeat(this.TOOLBAR_ITEMS, (item, i) => `${i}-${item.id}`, item => item.render(this.editorState))}
       </div>
     `
   }
@@ -76,7 +76,7 @@ class ToolbarCtrl_Separator extends ToolbarCtrl {
   }
 
   render () {
-    return html`<div class="sep">|</div>`
+    return html`<div class="sep"></div>`
   }
 }
 
@@ -90,8 +90,24 @@ class ToolbarCtrl_Formatting extends ToolbarCtrl {
     return this.formattingCommand
   }
 
-  render (richTextState) {
-    const pressed = richTextState[this.formattingCommand]
+  checkDisabled (editorState) {
+    if (this.formattingCommand === 'bold') {
+      switch (editorState.currentBlock) {
+        case 'h1':
+        case 'h2':
+        case 'h3':
+        case 'h4':
+        case 'h5':
+        case 'h6':
+          return true
+      }
+    }
+    return false
+  }
+
+  render (editorState) {
+    let disabled = this.checkDisabled(editorState)
+    const pressed = !disabled && editorState[this.formattingCommand]
     const icon = ({
       'bold': icons.bold(),
       'italic': icons.italic(),
@@ -102,7 +118,7 @@ class ToolbarCtrl_Formatting extends ToolbarCtrl {
     })[this.formattingCommand] || icons.questionMark()
     return html`
       <div
-        class=${classMap({btn: true, disabled: this.isDisabled, pressed})}
+        class=${classMap({btn: true, disabled, pressed})}
         @mousedown=${this.onMousedown.bind(this)}
       >
         ${icon}
