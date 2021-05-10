@@ -77,6 +77,7 @@ export class CtznEditorBlock extends LitElement {
     if (v) this.classList.add('block-selected')
     else this.classList.remove('block-selected')
     this._isBlockSelected = v
+    this.emitStateChanged()
   }
 
   isCursorAtStart () {
@@ -151,7 +152,7 @@ export class CtznEditorBlock extends LitElement {
   getFocusedBlock () {
     if (!this.subBlocks?.length) return undefined
     for (let block of this.subBlocks) {
-      if (block.isBufferFocused) return block
+      if (block.isBufferFocused || block.isBlockSelected) return block
       let subFocused = block.getFocusedBlock()
       if (subFocused) return subFocused
     }

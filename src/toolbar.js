@@ -63,6 +63,25 @@ class ToolbarCtrl {
     return 'base'
   }
 
+  checkDisabled (editorState) {
+    if (editorState.currentBlock === 'hr') {
+      return true
+    }
+    if (this.formattingCommand === 'bold') {
+      switch (editorState.currentBlock) {
+        case 'h1':
+        case 'h2':
+        case 'h3':
+        case 'h4':
+        case 'h5':
+        case 'h6':
+        case 'dt':
+          return true
+      }
+    }
+    return false
+  }
+
   render () {
     return html`
       <div class="disabled">${icons.questionMark()}</div>
@@ -88,22 +107,6 @@ class ToolbarCtrl_Formatting extends ToolbarCtrl {
 
   get id () {
     return this.formattingCommand
-  }
-
-  checkDisabled (editorState) {
-    if (this.formattingCommand === 'bold') {
-      switch (editorState.currentBlock) {
-        case 'h1':
-        case 'h2':
-        case 'h3':
-        case 'h4':
-        case 'h5':
-        case 'h6':
-        case 'dt':
-          return true
-      }
-    }
-    return false
   }
 
   render (editorState) {
@@ -189,9 +192,12 @@ class ToolbarCtrl_ClearFormatting extends ToolbarCtrl {
     return 'clear-formatting'
   }
 
-  render () {
+  render (editorState) {
     return html`
-      <div class="btn" @mousedown=${this.onMousedown.bind(this)}>${icons.clearFormatting()}</div>
+      <div
+        class=${classMap({btn: true, disabled: this.checkDisabled(editorState)})}"
+        @mousedown=${this.onMousedown.bind(this)}
+      >${icons.clearFormatting()}</div>
     `
   }
 

@@ -1,4 +1,3 @@
-import { html } from 'lit'
 import { CtznEditorBlock } from './base.js'
 
 export class CtznEditorBlock_Editor extends CtznEditorBlock {

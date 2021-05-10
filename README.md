@@ -19,7 +19,6 @@ This is a blocks-oriented WYSIWYG editor geared towards building user interfaces
     - Table
     - Lists inside lists
     - Pre
-    - DL
   - All HTML inline formatting
   - All CTZN block types
   - Handle HTML that's not wrapped at the top level in a block tag
