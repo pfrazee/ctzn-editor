@@ -181,6 +181,14 @@ ctzn-editor-toolbar .controls svg[data-icon="question"] {
   list-style: decimal;
 }
 
+.block-content.as-dl .block-content.as-dt {
+  font-weight: bold;
+}
+
+.block-content.as-dl .block-content.as-dd {
+  padding-left: 2rem;
+}
+
 .block-content.as-hr > hr {
   border: 0;
   border-top: 2px solid #ddd;

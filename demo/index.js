@@ -9,6 +9,11 @@ window.toJSON = () => {
 
 window.addEventListener('load', () => {
   document.querySelector('ctzn-editor').fromHTML(`
+    <dl>
+      <dt>One</dt><dd>Definition</dd>
+      <dt>One</dt><dd>Definition</dd>
+      <dt>One</dt><dd>Definition</dd>
+    </dl>
     <h1>Heading 1</h1>
     <p>Content</p>
     <hr>

@@ -17,7 +17,6 @@ This is a blocks-oriented WYSIWYG editor geared towards building user interfaces
 - Content
   - All HTML block types
     - Table
-    - HR
     - Lists inside lists
     - Pre
     - DL

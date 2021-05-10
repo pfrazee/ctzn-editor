@@ -99,6 +99,7 @@ class ToolbarCtrl_Formatting extends ToolbarCtrl {
         case 'h4':
         case 'h5':
         case 'h6':
+        case 'dt':
           return true
       }
     }

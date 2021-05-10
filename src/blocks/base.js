@@ -208,6 +208,9 @@ export class CtznEditorBlock extends LitElement {
       case 'ol': return html`<ctzn-editor-block--ol is-block .definition=${block} data-index=${index}></ctzn-editor-block--ol>`
       case 'li': return html`<ctzn-editor-block--li is-block .definition=${block} data-index=${index}></ctzn-editor-block--li>`
       case 'hr': return html`<ctzn-editor-block--hr is-block .definition=${block} data-index=${index}></ctzn-editor-block--hr>`
+      case 'dd': return html`<ctzn-editor-block--dd is-block .definition=${block} data-index=${index}></ctzn-editor-block--dd>`
+      case 'dt': return html`<ctzn-editor-block--dt is-block .definition=${block} data-index=${index}></ctzn-editor-block--dt>`
+      case 'dl': return html`<ctzn-editor-block--dl is-block .definition=${block} data-index=${index}></ctzn-editor-block--dl>`
       default: return html`<ctzn-editor-block is-block .definition=${block} data-index=${index}></ctzn-editor-block>`
     }
   }

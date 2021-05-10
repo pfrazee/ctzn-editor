@@ -7,7 +7,9 @@ const LEAF_BLOCK_TAG_NAMES = [
   'H5',
   'H6',
   'LI',
-  'HR'
+  'HR',
+  'DT',
+  'DD'
 ]
 const VOID_BLOCK_TAG_NAMES = [
   'HR'
@@ -25,7 +27,10 @@ const SUPPORTED_BLOCK_TAG_NAMES = [
   'LI',
   'BLOCKQUOTE',
   // 'TABLE',
-  'HR'
+  'HR',
+  'DD',
+  'DL',
+  'DT'
 ]
 const SUPPORTED_INLINE_TAG_NAMES = [
   'STRONG',
@@ -69,15 +74,35 @@ export class CtznEditorBlockDefinition {
       return dst
     }
     if (isList(this) && !isList(dst)) {
-      dst.content = this.blocks.map(block => `- ${block.content}`).join('<br>\n')
+      dst.content = this.toText()
     } else if (!isList(this) && isList(dst)) {
       let items = (this.content || '').split(/([\r\n]|<br>)/g)
         .map(str => str.trim().replace(/^- /, ''))
         .filter(str => str && str !== '<br>')
       if (items.length === 0) items.push('')
-      dst.blocks = items.map(item => new CtznEditorBlockDefinition({tagName: 'li', content: item}))
+      if (dst.tagName === 'dl') {
+        dst.blocks = items.map((item, i) => new CtznEditorBlockDefinition({tagName: i % 2 === 0 ? 'dt' : 'dd', content: item}))
+      } else {
+        dst.blocks = items.map(item => new CtznEditorBlockDefinition({tagName: 'li', content: item}))
+      }
+    } else if (isList(this) && isList(dst)) {
+      if (this.tagName === 'dl' && dst.tagName !== 'dl') {
+        dst.blocks = this.blocks.map((block) => new CtznEditorBlockDefinition({tagName: 'li', content: block.content}))
+      } else if (this.tagName !== 'dl' && dst.tagName === 'dl') {
+        dst.blocks = this.blocks.map((block, i) => new CtznEditorBlockDefinition({tagName: i % 2 === 0 ? 'dt' : 'dd', content: block.content}))
+      }
     }
     return dst
+  }
+
+  toText () {
+    if (this.tagName === 'ul' || this.tagName === 'ol') {
+      return this.blocks.map(block => `- ${block.content}`).join('<br>\n')
+    }
+    if (this.tagName === 'dl') {
+      return this.blocks.map(block => `- ${block.content}`).join('<br>\n')
+    }
+    return this.content
   }
 
   toHTML () {
@@ -93,7 +118,7 @@ export class CtznEditorBlockDefinition {
 }
 
 function isList (def) {
-  return def.tagName === 'ul' || def.tagName === 'ol'
+  return def.tagName === 'ul' || def.tagName === 'ol' || def.tagName === 'dl'
 }
 
 export function fromHTML (html) {

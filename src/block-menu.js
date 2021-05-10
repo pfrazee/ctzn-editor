@@ -71,6 +71,7 @@ export class CtznEditorBlockMenu extends LitElement {
       </div>
       ${this.renderBlockTagOption('ul', icons.bulletList(13, 13), 'Bulleted List')}
       ${this.renderBlockTagOption('ol', icons.numberedList(13, 13), 'Numbered List')}
+      ${this.renderBlockTagOption('dl', icons.definitionsList(13, 13), 'Definitions List')}
     `
   }
 
