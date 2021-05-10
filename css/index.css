@@ -177,3 +177,8 @@ ctzn-editor-toolbar .controls svg[data-icon="question"] {
   display: list-item;
   list-style: decimal;
 }
+
+.block-content.as-hr > hr {
+  border: 0;
+  border-top: 2px solid #ddd;
+}

@@ -173,6 +173,7 @@ export class CtznEditorBlock extends LitElement {
       case 'ul': return html`<ctzn-editor-block--ul is-block .definition=${block} data-index=${index}></ctzn-editor-block--ul>`
       case 'ol': return html`<ctzn-editor-block--ol is-block .definition=${block} data-index=${index}></ctzn-editor-block--ol>`
       case 'li': return html`<ctzn-editor-block--li is-block .definition=${block} data-index=${index}></ctzn-editor-block--li>`
+      case 'hr': return html`<ctzn-editor-block--hr is-block .definition=${block} data-index=${index}></ctzn-editor-block--hr>`
       default: return html`<ctzn-editor-block is-block .definition=${block} data-index=${index}></ctzn-editor-block>`
     }
   }
@@ -385,25 +386,34 @@ export class CtznEditorBlock extends LitElement {
     let dstBlock = this.definition.blocks[dstIndex]
     if (!srcBlock || !dstBlock) return
 
-    // TODO
-    // handle joins between branches and leaves
+    if (dstBlock.isVoidBlock) {
+      this.definition.blocks = this.definition.blocks.filter(block => block !== dstBlock)
+      this.requestUpdate()
+      await this.updateComplete
+      if (dstIndex < srcIndex) {
+        this.subBlocks[srcIndex - 1].focusBuffer('up')
+      }
+    } else {
+      // TODO
+      // handle joins between branches and leafs
 
-    const minIndex = Math.min(srcIndex, dstIndex)
-    const content = (e.detail.dir < 0)
-      ? `${dstBlock.content}${srcBlock.content}`
-      : `${srcBlock.content}${dstBlock.content}`
+      const minIndex = Math.min(srcIndex, dstIndex)
+      const content = (e.detail.dir < 0)
+        ? `${dstBlock.content}${srcBlock.content}`
+        : `${srcBlock.content}${dstBlock.content}`
 
-    this.definition.blocks = [
-      ...this.definition.blocks.slice(0, minIndex),
-      dstBlock.clone({content}),
-      ...this.definition.blocks.slice(minIndex + 2)
-    ]
-    this.requestUpdate()
-    await this.updateComplete
-    this.subBlocks[minIndex].focusBuffer(
-      e.detail.dir > 0 ? 'down' : 'up',
-      e.detail.dir > 0 ? srcBlock.content.length : dstBlock.content.length
-    )
+      this.definition.blocks = [
+        ...this.definition.blocks.slice(0, minIndex),
+        dstBlock.clone({content}),
+        ...this.definition.blocks.slice(minIndex + 2)
+      ]
+      this.requestUpdate()
+      await this.updateComplete
+      this.subBlocks[minIndex].focusBuffer(
+        e.detail.dir > 0 ? 'down' : 'up',
+        e.detail.dir > 0 ? srcBlock.content.length : dstBlock.content.length
+      )
+    }
     this.emitStateChanged()
   }
 }

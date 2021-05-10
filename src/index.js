@@ -3,6 +3,7 @@ import { CtznEditorBlockDefinition, fromHTML } from './data-model.js'
 import './blocks/base.js'
 import './blocks/editor.js'
 import './blocks/lists.js'
+import './blocks/hr.js'
 import './toolbar.js'
 
 export class CtznEditor extends LitElement {

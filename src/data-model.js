@@ -47,6 +47,14 @@ export class CtznEditorBlockDefinition {
     this.blocks = blocks
   }
 
+  get isVoidBlock () {
+    return VOID_BLOCK_TAG_NAMES.includes(this.tagName.toUpperCase())
+  }
+
+  get isLeafBlock () {
+    return LEAF_BLOCK_TAG_NAMES.includes(this.tagName.toUpperCase())
+  }
+
   clone (props) {
     const dst = new CtznEditorBlockDefinition(Object.assign({}, this, props, {blocks: []}))
     for (let block of (this.blocks || [])) {

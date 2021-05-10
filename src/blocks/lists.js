@@ -1,4 +1,3 @@
-import { html } from 'lit'
 import { CtznEditorBlock } from './base.js'
 
 export class CtznEditorBlock_UL extends CtznEditorBlock {
@@ -80,15 +79,5 @@ export class CtznEditorBlock_LI extends CtznEditorBlock {
   get canChangeTag () {
     return false
   }
-  /*renderBuffer () {
-    return html`
-      <ul>
-        <li contenteditable @keydown=${this.onKeyDown} @input=${this.onInput}></li>
-      </ul>
-      <div class="buffer as-${this.definition.tagName}" contenteditable @keydown=${this.onKeyDown} @input=${this.onInput}>
-        ${unsafeHTML(this.definition.content)}
-      </div>
-    `
-  }*/
 }
 customElements.define('ctzn-editor-block--li', CtznEditorBlock_LI)
