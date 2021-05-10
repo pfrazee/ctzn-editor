@@ -28,9 +28,9 @@ This is a blocks-oriented WYSIWYG editor geared towards building user interfaces
   - UI aesthetics
   - Handle HTML that's not wrapped at the top level in a block tag
   - Allow blocks inside blockquote?
-  - Support <pre>?
-  - Support <dl>?
-  - Support <kbd>?
+  - Support &lt;pre&gt;?
+  - Support &lt;dl&gt;?
+  - Support &lt;kbd&gt;?
   - Parser handle attributes?
 
 ## Attributions
