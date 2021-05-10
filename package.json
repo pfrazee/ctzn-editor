@@ -1,0 +1,30 @@
+{
+  "name": "ctzn-wysiwyg",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "lit": "^2.0.0-rc.2"
+  },
+  "devDependencies": {
+    "@rollup/plugin-buble": "^0.21.3",
+    "@rollup/plugin-node-resolve": "^13.0.0",
+    "express": "^4.17.1",
+    "postcss": "^8.2.14",
+    "postcss-cli": "^8.3.1",
+    "postcss-import": "^14.0.1",
+    "rollup": "^2.26.3",
+    "rollup-plugin-commonjs": "^10.1.0"
+  },
+  "scripts": {
+    "build": "npm run build-js && npm run build-css",
+    "build-js": "rollup -c",
+    "build-css": "postcss --use postcss-import -o dist/index.css css/index.css",
+    "watch": "rollup -c -w",
+    "demo-server": "node ./demo/server.js",
+    "prepare": "npm run build"
+  }
+}

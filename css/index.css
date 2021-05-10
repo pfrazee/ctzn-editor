@@ -1,0 +1,164 @@
+ctzn-editor-toolbar {
+  display: block;
+  background: #fff;
+  border: 1px solid #ccc;
+  position: sticky;
+  top: 0;
+}
+
+ctzn-editor-toolbar .controls {
+  display: flex;
+  align-items: center;
+  padding: 0.25rem 0.25rem;
+  line-height: 1;
+}
+
+ctzn-editor-toolbar .controls > div {
+  padding: 0.25rem 0.5rem;
+  margin: 0 0.1rem;
+  border-radius: 0.25rem;
+  cursor: pointer;
+}
+
+ctzn-editor-toolbar .controls > div:hover {
+  background: #f5f5f7;
+}
+
+ctzn-editor-toolbar .controls > div.disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+ctzn-editor-toolbar .controls > div.disabled:hover {
+  background: transparent;
+}
+
+ctzn-editor-toolbar .controls > div.pressed {
+  background: #e5e5e7;
+}
+
+ctzn-editor-toolbar .controls > div.pressed:hover {
+  background: #f5f5f7;
+}
+
+ctzn-editor-toolbar .controls > div.sep {
+  color: #aab;
+  cursor: default;
+}
+
+ctzn-editor-toolbar .controls > div.sep:hover {
+  background: transparent;
+}
+
+ctzn-editor-toolbar .controls svg[data-icon="underline"] {
+  position: relative;
+  top: 1px;
+}
+
+ctzn-editor-toolbar .controls svg[data-icon="question"] {
+  opacity: 0.5;
+}
+
+.block-wrapper {
+  display: flex;
+  margin: 1rem 0;
+}
+
+*[is-block] {
+  display: block;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji';
+}
+
+.block-ctrl {
+  flex: 0 0 1.25rem;
+  opacity: 0;
+  color: #6b6b75;
+}
+
+.block-ctrl span {
+  border-radius: 0.15rem;
+  padding: 0.2rem 0.1rem 0.1rem;
+  margin-top: 0.05rem;
+  display: inline-block;
+  cursor: pointer;
+}
+
+.block-ctrl:hover span {
+  background: #eef;
+}
+
+*[is-block]:hover > .block-wrapper {
+  background: #fafafd;
+}
+
+*[is-block]:hover > .block-wrapper > .block-ctrl,
+*[is-block].focused > .block-wrapper > .block-ctrl {
+  opacity: 1;
+}
+
+.buffer:focus {
+  outline: 0;
+  /* background: yellow; */
+}
+
+.block-content {
+  flex: 1;
+  padding: 0.2rem 0.3rem;
+}
+
+.block-content.as-h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  padding: 0 0.3rem;
+}
+
+.block-content.as-h2 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  padding: 0 0.3rem;
+}
+
+.block-content.as-h3 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  padding: 0 0.3rem;
+}
+
+.block-content.as-h4 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  padding: 0 0.3rem;
+}
+
+.block-content.as-h5 {
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.block-content.as-h6 {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.3rem 0.3rem;
+}
+
+.block-content.as-blockquote {
+  padding: 0.75rem;
+  border-left: 0.5rem solid #eee;
+  color: #666;
+  font-style: italic;
+}
+
+.block-content.as-ul,
+.block-content.as-ol {
+  padding-left: 1.4rem;
+}
+
+.block-content.as-ul .block-content.as-li {
+  display: list-item;
+  list-style: disc;
+}
+
+.block-content.as-ol .block-content.as-li {
+  display: list-item;
+  list-style: decimal;
+}
