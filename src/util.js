@@ -4,10 +4,18 @@ export function cursorTo (range) {
   sel.addRange(range)
 }
 
+export function getCurrentSelectionRange () {
+  try {
+    return window.getSelection().getRangeAt(0)
+  } catch (e) {
+    return undefined
+  }
+}
+
 export function getPlainTextCaretOffset (el) {
   if (!el) return 0
-  const sel = window.getSelection()
-  const range = sel.getRangeAt(0)
+  const range = getCurrentSelectionRange()
+  if (!range) return 0
   const range2 = document.createRange()
   range2.selectNodeContents(el)
   range2.setEnd(range.startContainer, range.startOffset)

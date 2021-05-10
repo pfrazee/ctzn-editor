@@ -113,7 +113,10 @@ ctzn-editor-toolbar .controls svg[data-icon="question"] {
 
 .buffer:focus {
   outline: 0;
-  /* background: yellow; */
+}
+
+*[is-block].block-selected .block-content {
+  outline: 1px solid #007eff;
 }
 
 .block-content {

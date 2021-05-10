@@ -1,7 +1,7 @@
 import { LitElement, html } from 'lit'
 import { repeat } from 'lit/directives/repeat.js'
 import { unsafeHTML } from 'lit/directives/unsafe-html.js'
-import { splitContentAtCursor, getPlainTextCaretOffset, setPlainTextCaretOffset } from '../util.js'
+import { getCurrentSelectionRange, splitContentAtCursor, getPlainTextCaretOffset, setPlainTextCaretOffset } from '../util.js'
 import * as contextMenu from '../context-menu.js'
 import { CtznEditorBlockDefinition } from '../data-model.js'
 import * as icons from '../icons.js'
@@ -10,7 +10,8 @@ import '../block-menu.js'
 export class CtznEditorBlock extends LitElement {
   static get properties () {
     return {
-      definition: {type: Object} // a CtznEditorBlockDefinition
+      definition: {type: Object}, // a CtznEditorBlockDefinition
+      _isBlockSelected: {type: Boolean}
     }
   }
 
@@ -22,6 +23,8 @@ export class CtznEditorBlock extends LitElement {
     super()
     this.isBufferFocused = false
     this.definition = undefined
+    this._isBlockSelected = false
+    this.$onGlobalKeydown = this.onGlobalKeydown.bind(this)
     if (this.containsBlocks) {
       this.addEventListener('select-prev-block', this.onSelectPrevBlock.bind(this))
       this.addEventListener('select-next-block', this.onSelectNextBlock.bind(this))
@@ -31,6 +34,16 @@ export class CtznEditorBlock extends LitElement {
       this.addEventListener('split-block', this.onSplitBlock.bind(this))
       this.addEventListener('join-block', this.onJoinBlock.bind(this))
     }
+  }
+
+  connectedCallback () {
+    super.connectedCallback()
+    window.addEventListener('keydown', this.$onGlobalKeydown)
+  }
+
+  disconnectedCallback () {
+    super.disconnectedCallback()
+    window.removeEventListener('keydown', this.$onGlobalKeydown)
   }
 
   get buffer () {
@@ -56,11 +69,21 @@ export class CtznEditorBlock extends LitElement {
     return true
   }
 
+  get isBlockSelected () {
+    return this._isBlockSelected
+  }
+
+  set isBlockSelected (v) {
+    if (v) this.classList.add('block-selected')
+    else this.classList.remove('block-selected')
+    this._isBlockSelected = v
+  }
+
   isCursorAtStart () {
     const buffer = this.buffer
     if (!buffer) return false
     const sel = window.getSelection()
-    if (!sel.isCollapsed) return false
+    if (!sel || !sel.isCollapsed) return false
 
     const range = sel.getRangeAt(0)
     const range2 = document.createRange()
@@ -73,7 +96,7 @@ export class CtznEditorBlock extends LitElement {
     const buffer = this.buffer
     if (!buffer) return
     const sel = window.getSelection()
-    if (!sel.isCollapsed) return
+    if (!sel || !sel.isCollapsed) return
     
     const range = sel.getRangeAt(0)
     const range2 = document.createRange()
@@ -84,7 +107,8 @@ export class CtznEditorBlock extends LitElement {
 
   checkIfCursorMoved () {
     let didMove = false
-    const currentRange = window.getSelection().getRangeAt(0)
+    const currentRange = getCurrentSelectionRange()
+    if (!currentRange) return
     if (this.lastSelectionRange) {
       if (currentRange.compareBoundaryPoints(Range.START_TO_START, this.lastSelectionRange) !== 0) {
         didMove = true
@@ -98,7 +122,10 @@ export class CtznEditorBlock extends LitElement {
   }
 
   async focusBuffer (direction, cursorPos) {
-    if (this.containsBlocks) {
+    if (this.definition?.isVoidBlock) {
+      this.isBlockSelected = true
+      document.activeElement.blur()
+    } else if (this.containsBlocks) {
       if (!this.definition?.blocks?.length) {
         return
       }
@@ -141,7 +168,11 @@ export class CtznEditorBlock extends LitElement {
   render () {
     if (!this.definition) return html``
     if (!this.canChangeTag) {
-      return html`<div class="block-content as-${this.definition.tagName}">${this.renderContent()}</div>`
+      return html`
+        <div
+          class="block-content as-${this.definition.tagName}"
+          @click=${this.onClickContent}
+        >${this.renderContent()}</div>`
     }
     return html`
       <div class="block-wrapper">
@@ -149,7 +180,10 @@ export class CtznEditorBlock extends LitElement {
           <span>${icons.gripVertical(14, 14)}</span>
         </div>
         <div class="menu-container"></div>
-        <div class="block-content as-${this.definition.tagName}">${this.renderContent()}</div>
+        <div
+          class="block-content as-${this.definition.tagName}"
+          @click=${this.onClickContent}
+        >${this.renderContent()}</div>
       </div>
     `
   }
@@ -225,9 +259,35 @@ export class CtznEditorBlock extends LitElement {
     this.classList.remove('is-menu-open')
   }
 
+  onGlobalKeydown (e) {
+    const redispatch = (eventName, detail) => {
+      e.preventDefault()
+      e.stopPropagation()
+      this.dispatchEvent(new CustomEvent(eventName, {bubbles: true, detail}))
+    }
+    if (this.definition?.isVoidBlock && this.isBlockSelected) {
+      switch (e.code) {
+        case 'ArrowUp': return redispatch('select-prev-block')
+        case 'ArrowDown': return redispatch('select-next-block')
+        case 'Enter':
+        case 'NumpadEnter': return redispatch('append-new-block')
+        case 'Backspace':
+        case 'Delete': return redispatch('delete-block')
+      }
+    }
+  }
+
+  onClickContent (e) {
+    if (this.definition?.isVoidBlock && !this.isBlockSelected) {
+      blurSelectedBlock()
+      this.isBlockSelected = true
+    }
+  }
+
   onKeydownBuffer (e) {
     const redispatch = (eventName, detail) => {
       e.preventDefault()
+      e.stopPropagation()
       this.dispatchEvent(new CustomEvent(eventName, {bubbles: true, detail}))
     }
     switch (e.code) {
@@ -249,6 +309,7 @@ export class CtznEditorBlock extends LitElement {
         } else if (e.code === 'Delete' && this.isCursorAtEnd()) {
           return redispatch('join-block', {dir: 1})
         }
+        return
     }
   }
 
@@ -266,6 +327,7 @@ export class CtznEditorBlock extends LitElement {
   }
 
   onFocusBuffer (e) {
+    blurSelectedBlock()
     this.isBufferFocused = true
     this.classList.add('focused')
   }
@@ -278,19 +340,27 @@ export class CtznEditorBlock extends LitElement {
   onSelectPrevBlock (e) {    
     e.stopPropagation()
     if (e.target.previousElementSibling?.hasAttribute('is-block')) {
-      const cursorPos = getPlainTextCaretOffset(this.getFocusedSubBlock()?.buffer)
-      e.target.previousElementSibling.focusBuffer('up', cursorPos)
+      if (e.target.definition?.isVoidBlock) {
+        e.target.previousElementSibling.focusBuffer('up')
+      } else {
+        const cursorPos = getPlainTextCaretOffset(this.getFocusedSubBlock()?.buffer)
+        e.target.previousElementSibling.focusBuffer('up', cursorPos)
+      }
       this.emitStateChanged()
     } else if (this.definition.tagName !== 'editor') {
       this.dispatchEvent(new CustomEvent('select-prev-block', {bubbles: true}))
     }
   }
 
-  onSelectNextBlock (e) {    
+  onSelectNextBlock (e) {
     e.stopPropagation()
     if (e.target.nextElementSibling?.hasAttribute('is-block')) {
-      const cursorPos = getPlainTextCaretOffset(this.getFocusedSubBlock()?.buffer)
-      e.target.nextElementSibling.focusBuffer('down', cursorPos)
+      if (this.definition?.isVoidBlock) {
+        e.target.nextElementSibling.focusBuffer('up')
+      } else {
+        const cursorPos = getPlainTextCaretOffset(this.getFocusedSubBlock()?.buffer)
+        e.target.nextElementSibling.focusBuffer('down', cursorPos)
+      }
       this.emitStateChanged()
     } else if (this.definition.tagName !== 'editor') {
       this.dispatchEvent(new CustomEvent('select-next-block', {bubbles: true}))
@@ -418,3 +488,7 @@ export class CtznEditorBlock extends LitElement {
   }
 }
 customElements.define('ctzn-editor-block', CtznEditorBlock)
+
+function blurSelectedBlock () {
+  Array.from(document.body.querySelectorAll('[is-block].block-selected'), el => {el.isBlockSelected = false})
+}

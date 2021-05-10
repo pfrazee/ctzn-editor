@@ -11,6 +11,8 @@ window.addEventListener('load', () => {
   document.querySelector('ctzn-editor').fromHTML(`
     <h1>Heading 1</h1>
     <p>Content</p>
+    <hr>
+    <p>More content</p>
     <h2>Heading 2</h2>
     <p>Content</p>
     <h3>Heading 3</h3>

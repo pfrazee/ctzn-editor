@@ -25,7 +25,7 @@ const SUPPORTED_BLOCK_TAG_NAMES = [
   'LI',
   'BLOCKQUOTE',
   // 'TABLE',
-  // 'HR'
+  'HR'
 ]
 const SUPPORTED_INLINE_TAG_NAMES = [
   'STRONG',
