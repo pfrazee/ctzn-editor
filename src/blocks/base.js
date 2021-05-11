@@ -1,5 +1,6 @@
 import { LitElement, html } from 'lit'
 import { repeat } from 'lit/directives/repeat.js'
+import { ifDefined } from 'lit/directives/if-defined.js'
 import { unsafeHTML } from 'lit/directives/unsafe-html.js'
 import { insertNewlineAtCursor, getCurrentSelectionRange, splitContentAtCursor, getPlainTextCaretOffset, setPlainTextCaretOffset } from '../util.js'
 import * as contextMenu from '../context-menu.js'
@@ -33,6 +34,7 @@ export class CtznEditorBlock extends LitElement {
       this.addEventListener('delete-block', this.onDeleteBlock.bind(this))
       this.addEventListener('split-block', this.onSplitBlock.bind(this))
       this.addEventListener('join-block', this.onJoinBlock.bind(this))
+      this.addEventListener('change-block-indentation', this.onChangeBlockIndentation.bind(this))
     }
   }
 
@@ -67,6 +69,10 @@ export class CtznEditorBlock extends LitElement {
 
   get canChangeTag () {
     return true
+  }
+
+  get customBufferStyles () {
+    return undefined
   }
 
   get isBlockSelected () {
@@ -227,6 +233,7 @@ export class CtznEditorBlock extends LitElement {
         @input=${this.onInputBuffer}
         @focus=${this.onFocusBuffer}
         @blur=${this.onBlurBuffer}
+        style=${ifDefined(this.customBufferStyles)}
       >${unsafeHTML(this.definition.content || '')}</div>
     `
   }
@@ -319,6 +326,8 @@ export class CtznEditorBlock extends LitElement {
           return redispatch('join-block', {dir: 1})
         }
         return
+      case 'Tab':
+        return redispatch('change-block-indentation', {direction: e.shiftKey ? -1 : 1})
     }
   }
 
@@ -381,6 +390,12 @@ export class CtznEditorBlock extends LitElement {
     
     const index = +e.target.dataset.index
     const newBlock = new CtznEditorBlockDefinition({tagName: this.defaultSubBlockTag, content: ''})
+    const currentBlock = this.definition.blocks[index]
+
+    if (currentBlock.tagName === newBlock.tagName) {
+      newBlock.attributes = Object.assign({}, currentBlock.attributes)
+    }
+
     if (this.definition.blocks[index + 1]) {
       this.definition.blocks = [
         ...this.definition.blocks.slice(0, index + 1),
@@ -441,8 +456,16 @@ export class CtznEditorBlock extends LitElement {
     const srcIndex = +e.target.dataset.index
     const srcBlock = this.definition.blocks[srcIndex]
     const {leftContent, rightContent} = splitContentAtCursor(this.subBlocks[srcIndex].buffer)
-    const newBlock1 = new CtznEditorBlockDefinition({tagName: srcBlock.tagName, content: leftContent})
-    const newBlock2 = new CtznEditorBlockDefinition({tagName: srcBlock.tagName, content: rightContent})
+    const newBlock1 = new CtznEditorBlockDefinition({
+      tagName: srcBlock.tagName,
+      content: leftContent,
+      attributes: Object.assign({}, srcBlock.attributes)
+    })
+    const newBlock2 = new CtznEditorBlockDefinition({
+      tagName: srcBlock.tagName,
+      content: rightContent,
+      attributes: Object.assign({}, srcBlock.attributes)
+    })
     this.definition.blocks = [
       ...this.definition.blocks.slice(0, srcIndex),
       newBlock1,
@@ -493,6 +516,20 @@ export class CtznEditorBlock extends LitElement {
         e.detail.dir > 0 ? srcBlock.content.length : dstBlock.content.length
       )
     }
+    this.emitStateChanged()
+  }
+
+  async onChangeBlockIndentation (e) {
+    if (e.target === this) return // bubble up to parent
+    e.stopPropagation()
+
+    let index = +e.target.dataset.index
+    let block = this.definition.blocks[index].clone()
+    block.attributes.depth = Math.max(0, (block.attributes.depth || 0) + e.detail.direction)
+    this.definition.blocks[index] = block
+    this.requestUpdate()
+    await this.updateComplete
+    this.subBlocks[index].focusBuffer()
     this.emitStateChanged()
   }
 }

@@ -56,6 +56,7 @@ export class CtznEditor extends LitElement {
     return html`
       <ctzn-editor-toolbar
         .editorState=${this.editorState}
+        @toolbar-command=${this.onToolbarCommand}
       ></ctzn-editor-toolbar>
       <ctzn-editor-block--editor
         .definition=${this.rootBlock}
@@ -76,6 +77,15 @@ export class CtznEditor extends LitElement {
       strikeThrough: document.queryCommandState('strikeThrough'),
       superscript: document.queryCommandState('superscript'),
       subscript: document.queryCommandState('subscript')
+    }
+  }
+
+  onToolbarCommand (e) {
+    switch (e.detail.command) {
+      case 'indent':
+        let newEvent = new CustomEvent('change-block-indentation', {bubbles: true, detail: {direction: e.detail.direction}})
+        this.rootBlockEl.getFocusedBlock()?.dispatchEvent?.(newEvent)
+        break
     }
   }
 }

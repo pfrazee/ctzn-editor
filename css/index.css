@@ -177,12 +177,12 @@ ctzn-editor-toolbar .controls svg[data-icon="question"] {
   padding-left: 1.4rem;
 }
 
-.block-content.as-ul .block-content.as-li {
+.block-content.as-ul .block-content.as-li .buffer {
   display: list-item;
   list-style: disc;
 }
 
-.block-content.as-ol .block-content.as-li {
+.block-content.as-ol .block-content.as-li .buffer {
   display: list-item;
   list-style: decimal;
 }

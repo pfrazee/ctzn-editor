@@ -1,3 +1,28 @@
+
+const BLOCK_TAG_RULES = {
+  // blocktag => [blockTagsAllowedInside]
+  'EDITOR': undefined, // will have all BLOCK_TAG_RULES keys added (below)
+  'P': [],
+  'H1': [],
+  'H2': [],
+  'H3': [],
+  'H4': [],
+  'H5': [],
+  'H6': [],
+  'UL': ['UL', 'OL', 'LI'],
+  'OL': ['UL', 'OL', 'LI'],
+  'LI': ['UL', 'OL'],
+  'DL': ['DT', 'DD'],
+  'DD': [],
+  'DT': [],
+  'BLOCKQUOTE': [],
+  'PRE': [],
+  'HR': []
+}
+BLOCK_TAG_RULES.EDITOR = Object.keys(BLOCK_TAG_RULES)
+const VOID_BLOCK_TAG_NAMES = [
+  'HR'
+]
 const LEAF_BLOCK_TAG_NAMES = [
   'P',
   'H1',
@@ -7,31 +32,10 @@ const LEAF_BLOCK_TAG_NAMES = [
   'H5',
   'H6',
   'LI',
-  'HR',
-  'DT',
-  'DD'
-]
-const VOID_BLOCK_TAG_NAMES = [
-  'HR'
-]
-const SUPPORTED_BLOCK_TAG_NAMES = [
-  'P',
-  'H1',
-  'H2',
-  'H3',
-  'H4',
-  'H5',
-  'H6',
-  'UL',
-  'OL',
-  'LI',
-  'BLOCKQUOTE',
-  'PRE',
-  // 'TABLE',
-  'HR',
   'DD',
-  'DL',
-  'DT'
+  'DT',
+  'BLOCKQUOTE',
+  'PRE'
 ]
 const SUPPORTED_INLINE_TAG_NAMES = [
   'STRONG',
@@ -46,9 +50,10 @@ const SUPPORTED_INLINE_TAG_NAMES = [
 ]
 
 export class CtznEditorBlockDefinition {
-  constructor ({tagName, content, blocks}) {
+  constructor ({tagName, content, blocks, attributes}) {
     this.id = `${Date.now()}-${Math.random()}`
     this.tagName = tagName
+    this.attributes = attributes || {}
     this.content = content || ''
     this.blocks = blocks
   }
@@ -57,15 +62,12 @@ export class CtznEditorBlockDefinition {
     return VOID_BLOCK_TAG_NAMES.includes(this.tagName.toUpperCase())
   }
 
-  get isLeafBlock () {
-    return LEAF_BLOCK_TAG_NAMES.includes(this.tagName.toUpperCase())
-  }
-
   clone (props) {
     const dst = new CtznEditorBlockDefinition(Object.assign({}, this, props, {blocks: []}))
     for (let block of (this.blocks || [])) {
       dst.blocks.push(block.clone({}))
     }
+    dst.attributes = Object.assign({}, this.attributes)
     return dst
   }
 
@@ -111,6 +113,27 @@ export class CtznEditorBlockDefinition {
       return this.blocks.map(block => block.toHTML()).join('\n')
     }
     if (this.tagName === 'hr') return `<hr>\n`
+    if (this.tagName === 'ul' || this.tagName === 'ol') {
+      // handle indentation
+      let currentDepth = -1
+      let arr = []
+      for (let block of this.blocks) {
+        while (currentDepth < block.attributes.depth) {
+          arr.push(`<${this.tagName}>\n`)
+          currentDepth++
+        }
+        while (currentDepth > block.attributes.depth) {
+          arr.push(`</${this.tagName}>`)
+          currentDepth--
+        }
+        arr.push(`<li>${block.content}</li>`)
+      }
+      while (currentDepth > -1) {
+        arr.push(`</${this.tagName}>`)
+        currentDepth--
+      }
+      return arr.join('\n')
+    }
     if (LEAF_BLOCK_TAG_NAMES.includes(this.tagName.toUpperCase())) {
       return `<${this.tagName}>${this.content}</${this.tagName}>\n`
     }
@@ -126,19 +149,20 @@ export function fromHTML (html) {
   const container = document.createElement('div')
   container.innerHTML = html
   console.log(container.childNodes)
-  const res = fromHTML_NodesToBlockDefinition('editor', container.childNodes)
+  const res = fromHTML_NodesToBlockDefinition('EDITOR', container.childNodes)
+  fromHTML_FlattenIndentedLists(res)
   console.log(res)
   return res
 }
 
 function fromHTML_NodesToBlockDefinition (tagName, nodes) {
-  const isLeaf = LEAF_BLOCK_TAG_NAMES.includes(tagName)
+  const isLeaf = !BLOCK_TAG_RULES[tagName]?.length
   const isVoid = VOID_BLOCK_TAG_NAMES.includes(tagName)
   const contents = []
   const blocks = []
   for (const node of nodes) {
     if (node.nodeType === Node.TEXT_NODE) {
-      if (tagName === 'editor') {
+      if (tagName === 'EDITOR') {
         // discard
       } else {
         contents.push(node.nodeValue)
@@ -146,7 +170,7 @@ function fromHTML_NodesToBlockDefinition (tagName, nodes) {
     } else {
       if (SUPPORTED_INLINE_TAG_NAMES.includes(node.tagName)) {
         contents.push(fromHTML_NodesToInlineContent(node.tagName, node.childNodes))
-      } else if (!isLeaf && SUPPORTED_BLOCK_TAG_NAMES.includes(node.tagName)) {
+      } else if (BLOCK_TAG_RULES[tagName].includes(node.tagName)) {
         blocks.push(fromHTML_NodesToBlockDefinition(node.tagName, node.childNodes))
       } else {
         if (isVoid) {
@@ -177,4 +201,40 @@ function fromHTML_NodesToInlineContent (tagName, nodes) {
     }
   }
   return `<${tag}>${contents.join('')}</${tag}>`
+}
+
+function fromHTML_FlattenIndentedLists (node) {
+  let currentListBlock = undefined
+  let flattenedBlocks
+  let depth = 0
+  for (let {block, start, end} of traverseTree(node)) {
+    if (start && (block.tagName === 'ul' || block.tagName === 'ol')) {
+      if (!currentListBlock) {
+        currentListBlock = block
+        flattenedBlocks = []
+        depth = 0
+      } else {
+        depth++
+      }
+    } else if (start && currentListBlock && block.tagName === 'li') {
+      block.attributes.depth = depth
+      flattenedBlocks.push(block)
+    } else if (end) {
+      if (block === currentListBlock) {
+        currentListBlock.blocks = flattenedBlocks
+        currentListBlock = undefined
+      } else if ((block.tagName === 'ul' || block.tagName === 'ol')) {
+        depth--
+      }
+    }
+  }
+}
+
+function* traverseTree (node, depth = 0) {
+  if (!node.blocks) return
+  for (let block of node.blocks) {
+    yield {block, depth, start: true, end: false}
+    yield* traverseTree(block, depth+1)
+    yield {block, depth, start: false, end: true}
+  }
 }

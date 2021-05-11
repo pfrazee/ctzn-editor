@@ -9,7 +9,14 @@ window.toJSON = () => {
 
 window.addEventListener('load', () => {
   document.querySelector('ctzn-editor').fromHTML(`
-    <pre>Pre block</pre>
+    <ul>
+      <li>One</li>
+      <ul>
+        <li>Two</li>
+      </ul>
+      <li>Three</li>
+      <li>Four</li>
+    </ul>
     <h1>Heading 1</h1>
     <p>Content</p>
     <hr>

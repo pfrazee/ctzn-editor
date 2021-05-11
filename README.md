@@ -17,7 +17,6 @@ This is a blocks-oriented WYSIWYG editor geared towards building user interfaces
 - Content
   - All HTML block types
     - Table
-    - Lists inside lists
   - All HTML inline formatting
   - All CTZN block types
   - Handle HTML that's not wrapped at the top level in a block tag
@@ -32,8 +31,6 @@ This is a blocks-oriented WYSIWYG editor geared towards building user interfaces
   - Drag & drop to rearrange blocks
   - Handle up/down keys within multiline block (has &lt;br&gt;s)
 - Various
-  - Indent/outdent for lists
-  - UI aesthetics
   - Mobile
 
 ## Attributions

@@ -176,10 +176,28 @@ class ToolbarCtrl_Indent extends ToolbarCtrl {
     return this.direction === 1 ? 'indent' : 'deindent'
   }
 
-  render () {
+  checkDisabled (editorState) {
+    if (editorState.currentBlock === 'li') {
+      return false
+    }
+    return true
+  }
+
+  render (editorState) {
     return html`
-      <div class="btn disabled">${this.direction < 0 ? icons.deindent() : icons.indent()}</div>
+      <div 
+        class=${classMap({btn: true, disabled: this.checkDisabled(editorState)})}
+        @mousedown=${this.onMousedown.bind(this)}
+      >
+        ${this.direction < 0 ? icons.deindent() : icons.indent()}
+      </div>
     `
+  }
+
+  onMousedown (e) {
+    e.preventDefault()
+    e.stopPropagation()
+    e.target.dispatchEvent(new CustomEvent('toolbar-command', {bubbles: true, detail: {command: 'indent', direction: this.direction}}))
   }
 }
 
@@ -195,7 +213,7 @@ class ToolbarCtrl_ClearFormatting extends ToolbarCtrl {
   render (editorState) {
     return html`
       <div
-        class=${classMap({btn: true, disabled: this.checkDisabled(editorState)})}"
+        class=${classMap({btn: true, disabled: this.checkDisabled(editorState)})}
         @mousedown=${this.onMousedown.bind(this)}
       >${icons.clearFormatting()}</div>
     `
