@@ -79,6 +79,34 @@ export function splitContentAtCursor (el) {
   }
 }
 
+export function insertTextAtCursor (text) {
+  const range = getCurrentSelectionRange()
+  if (range) {
+    range.deleteContents()
+    range.insertNode(document.createTextNode(text))
+    range.collapse()
+  }
+}
+
+export function insertNewlineAtCursor (el) {
+  const range = getCurrentSelectionRange()
+  if (range) {
+    range.deleteContents()
+
+    const rangeRight = document.createRange()
+    rangeRight.selectNodeContents(el)
+    rangeRight.setStart(range.endContainer, range.endOffset)
+    const requires2ndBreakline = rangeRight.cloneContents().textContent.length === 0
+
+    range.insertNode(document.createElement('br'))
+    range.collapse(false)
+    if (requires2ndBreakline) {
+      range.insertNode(document.createElement('br'))
+      range.collapse()
+    }
+  }
+}
+
 export function findParent (node, test) {
   if (typeof test === 'string') {
     // classname default

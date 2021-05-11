@@ -41,6 +41,7 @@ export class CtznEditorBlockMenu extends LitElement {
       ${this.renderChangeViewOption('headings', html`<span class="heading-icon">H</span>`, 'Heading')}
       ${this.renderChangeViewOption('lists', icons.bulletList(13, 13), 'List')}
       ${this.renderBlockTagOption('blockquote', icons.quote(13, 13), 'Quote')}
+      ${this.renderBlockTagOption('pre', html`<span class="monospace-icon">T</span>`, 'Monospace')}
       ${this.renderBlockTagOption('hr', html`<span class="separator-icon">—</span>`, 'Separator')}
       ${this.renderBlockTagOption('table', icons.table(13, 13), 'Table')}
     `
@@ -173,6 +174,13 @@ export class CtznEditorBlockMenu extends LitElement {
         .block-tag-icon .heading-icon {
           font-size: 12px;
           font-weight: bold;
+          position: relative;
+          top: -1px;
+        }
+        .block-tag-icon .monospace-icon {
+          font-size: 14px;
+          font-weight: bold;
+          font-family: monospace;
           position: relative;
           top: -1px;
         }

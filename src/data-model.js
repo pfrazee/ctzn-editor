@@ -26,6 +26,7 @@ const SUPPORTED_BLOCK_TAG_NAMES = [
   'OL',
   'LI',
   'BLOCKQUOTE',
+  'PRE',
   // 'TABLE',
   'HR',
   'DD',

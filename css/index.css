@@ -166,6 +166,12 @@ ctzn-editor-toolbar .controls svg[data-icon="question"] {
   font-style: italic;
 }
 
+.block-content.as-pre > .buffer {
+  font-family: monospace;
+  font-size: 1.1em;
+  white-space: pre;
+}
+
 .block-content.as-ul,
 .block-content.as-ol {
   padding-left: 1.4rem;

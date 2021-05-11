@@ -1,7 +1,7 @@
 import { LitElement, html } from 'lit'
 import { repeat } from 'lit/directives/repeat.js'
 import { unsafeHTML } from 'lit/directives/unsafe-html.js'
-import { getCurrentSelectionRange, splitContentAtCursor, getPlainTextCaretOffset, setPlainTextCaretOffset } from '../util.js'
+import { insertNewlineAtCursor, getCurrentSelectionRange, splitContentAtCursor, getPlainTextCaretOffset, setPlainTextCaretOffset } from '../util.js'
 import * as contextMenu from '../context-menu.js'
 import { CtznEditorBlockDefinition } from '../data-model.js'
 import * as icons from '../icons.js'
@@ -299,6 +299,11 @@ export class CtznEditorBlock extends LitElement {
       case 'ArrowDown': return redispatch('select-next-block')
       case 'Enter':
       case 'NumpadEnter':
+        if (e.shiftKey) {
+          e.preventDefault()
+          insertNewlineAtCursor(this.buffer)
+          return
+        }
         if (this.definition.content && !this.isCursorAtEnd()) {
           return redispatch('split-block')
         } else {
