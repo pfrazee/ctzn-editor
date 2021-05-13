@@ -8,7 +8,12 @@ window.toJSON = () => {
 }
 
 window.addEventListener('load', () => {
-  // return
+  document.querySelector('ctzn-editor').fromHTML(`
+    <p>One</p>
+    <p>Two</p>
+    <p>Three</p>
+  `)
+  return
   document.querySelector('ctzn-editor').fromHTML(`
     <ul>
       <li>One</li>

@@ -94,9 +94,9 @@ export class CtznEditorBlock_Unknown extends CtznEditorBlock {
 }
 
 export class CtznEditorBlock_Card extends CtznEditorBlock {
-  constructor (blocks) {
+  constructor ({blocks} = {}) {
     super()
-    this.blocks = blocks
+    this.blocks = blocks || []
   }
 
   get blockType () {
@@ -152,6 +152,19 @@ export function fromHTML (html) {
   const container = document.createElement('div')
   container.innerHTML = html
   return fromDOM(container)
+}
+
+export function fromTagName (tagName, ...args) {
+  switch (tagName) {
+    case 'richtext':
+      return new CtznEditorBlock_RichText(...args)
+    case 'ctzn-card':
+      return new CtznEditorBlock_Card(...args)
+    case 'ctzn-code':
+      return new CtznEditorBlock_Code(...args)
+    default:
+      return new CtznEditorBlock_Unknown(...args)
+  }
 }
 
 function fromDOM (container) {

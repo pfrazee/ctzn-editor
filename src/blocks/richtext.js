@@ -1,6 +1,9 @@
 import { LitElement, html } from 'lit'
 import * as contextMenu from '../context-menu.js'
 
+const STARTING_EMPTY_TAG_RE = /^<[^>]+>&nbsp;<\/[^>]+>/i
+const ENDING_EMPTY_TAG_RE = /<[^>]+>&nbsp;<\/[^>]+>$/i
+
 export class CtznEditorBlock_Richtext extends LitElement {
   static get properties () {
     return {
@@ -75,6 +78,30 @@ export class CtznEditorBlock_Richtext extends LitElement {
       underline: !!this.editor.queryCommandState('Underline'),
     }
     this.dispatchEvent(new CustomEvent('editor-state-change', {bubbles: true, detail}))
+  }
+
+  splitContentAtCursor () {
+    const selRange = this.editor.selection.getRng()
+    const body = this.editor.dom.doc.querySelector('body')
+
+    let middleContent = ''
+    if (!selRange.collapsed) {
+      middleContent = this.editor.selection.getContent()
+    }
+
+    const rangeLeft = this.editor.dom.createRng()
+    rangeLeft.selectNodeContents(body)
+    rangeLeft.setEnd(selRange.startContainer, selRange.startOffset)
+    this.editor.selection.setRng(rangeLeft)
+    const leftContent = this.editor.selection.getContent().replace(ENDING_EMPTY_TAG_RE, '')
+
+    const rangeRight = this.editor.dom.createRng()
+    rangeRight.selectNodeContents(body)
+    rangeRight.setStart(selRange.endContainer, selRange.endOffset)
+    this.editor.selection.setRng(rangeRight)
+    const rightContent = this.editor.selection.getContent().replace(STARTING_EMPTY_TAG_RE, '')
+
+    return {leftContent, middleContent, rightContent}
   }
 
   render () {

@@ -2,9 +2,13 @@ import { LitElement, html } from 'lit'
 import { classMap } from 'lit/directives/class-map.js'
 import * as icons from './icons.js'
 import * as contextMenu from './context-menu.js'
+import './menus/block.js'
 import './menus/html-block.js'
 
 const CTRL_ICONS = {
+  newblock: icons.newBlock,
+  // splitblock: icons.splitBlock,
+  deleteblock: icons.deleteBlock,
   bold: icons.bold,
   italic: icons.italic,
   underline: icons.underline,
@@ -59,6 +63,9 @@ export class CtznEditorToolbar extends LitElement {
   }
 
   checkDisabled (ctrl) {
+    // if (ctrl === 'splitblock') {
+    //   return this.editorState.currentBlockType !== 'richtext'
+    // }
     if (ctrl === 'bold') {
       switch (this.editorState.currentBlock) {
         case 'h1':
@@ -102,6 +109,15 @@ export class CtznEditorToolbar extends LitElement {
       return html`
         <div class="controls">
           <div
+            class="btn"
+            @click=${this.onClickBlockMenu}
+            @mousedown=${e => /* dont steal focus */ e.preventDefault()}
+          >
+            ${CTRL_ICONS.newblock()}
+          </div>
+          ${btn('deleteblock')}
+          <div class="sep"></div>
+          <div
             class="select"
             @click=${this.onClickHTMLBlockMenu}
             @mousedown=${e => /* dont steal focus */ e.preventDefault()}
@@ -138,6 +154,34 @@ export class CtznEditorToolbar extends LitElement {
 
   // events
   // =
+
+  async onClickBlockMenu (e) {
+    e.preventDefault()
+    e.stopPropagation()
+    const onAddBlock = e => {
+      this.dispatchEvent(new CustomEvent('insert-block', {bubbles: true, detail: e.detail}))
+    }
+    const el = e.currentTarget
+    if (el.classList.contains('pressed')) {
+      contextMenu.destroy()
+      return
+    }
+    const rect = el.getClientRects()[0]
+    el.classList.add('pressed')
+    await contextMenu.create({
+      x: rect.left,
+      y: rect.bottom,
+      noBorders: true,
+      render: () => {
+        return html`
+          <ctzn-editor-block-menu
+            @add-block=${onAddBlock}
+          ></ctzn-editor-block-menu>
+        `
+      }
+    })
+    el.classList.remove('pressed')
+  }
 
   async onClickHTMLBlockMenu (e) {
     e.preventDefault()
@@ -184,7 +228,11 @@ export class CtznEditorToolbar extends LitElement {
     if (this.checkDisabled(ctrl)) return
     const editor = this.editorState.focusedBlock.editor
     if (!editor) return
-    if (ctrl === 'table') {
+    /*if (ctrl === 'splitblock') {
+      this.dispatchEvent(new Event('split-focused-block', {bubbles: true}))
+    } else */if (ctrl === 'deleteblock') {
+      this.dispatchEvent(new Event('delete-focused-block', {bubbles: true}))
+    } else if (ctrl === 'table') {
       editor.execCommand('mceInsertTable', false, {rows: 2, columns: 2})
     } else {
       editor.execCommand(CTRL_COMMANDS[ctrl] || ctrl)

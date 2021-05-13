@@ -27,15 +27,9 @@ export class CtznEditorHTMLBlockMenu extends LitElement {
     if (this.currentView === 'headings') {
       return this.renderHeadingsMenu()
     }
-    if (this.currentView === 'lists') {
-      return this.renderListsMenu()
-    }
     return html`
       ${this.renderStyles()}
-      <div class="sticky-heading">
-        Change to...
-      </div>
-      ${this.renderBlockTagOption('p', icons.paragraph(13, 13), 'Text')}
+      ${this.renderBlockTagOption('p', icons.paragraph(13, 13), 'Paragraph')}
       ${this.renderChangeViewOption('headings', html`<span class="heading-icon">H</span>`, 'Heading')}
       ${this.renderBlockTagOption('ul', icons.bulletList(13, 13), 'Bulleted List')}
       ${this.renderBlockTagOption('ol', icons.numberedList(13, 13), 'Numbered List')}
@@ -48,7 +42,7 @@ export class CtznEditorHTMLBlockMenu extends LitElement {
       ${this.renderStyles()}
       <div class="sticky-heading">
         <span class="back" @click=${e => this.setCurrentView(undefined)}>${icons.angleLeft()}</span>
-        Change to heading...
+        Heading...
       </div>
       ${this.renderBlockTagOption('h1', html`<span class="heading-icon">H1</span>`, 'Heading 1')}
       ${this.renderBlockTagOption('h2', html`<span class="heading-icon">H2</span>`, 'Heading 2')}
@@ -56,18 +50,6 @@ export class CtznEditorHTMLBlockMenu extends LitElement {
       ${this.renderBlockTagOption('h4', html`<span class="heading-icon">H4</span>`, 'Heading 4')}
       ${this.renderBlockTagOption('h5', html`<span class="heading-icon">H5</span>`, 'Heading 5')}
       ${this.renderBlockTagOption('h6', html`<span class="heading-icon">H6</span>`, 'Heading 6')}
-    `
-  }
-
-  renderListsMenu () {
-    return html`
-      ${this.renderStyles()}
-      <div class="sticky-heading">
-        <span class="back" @click=${e => this.setCurrentView(undefined)}>${icons.angleLeft()}</span>
-        Change to list...
-      </div>
-      ${this.renderBlockTagOption('ul', icons.bulletList(13, 13), 'Bulleted List')}
-      ${this.renderBlockTagOption('ol', icons.numberedList(13, 13), 'Numbered List')}
     `
   }
 

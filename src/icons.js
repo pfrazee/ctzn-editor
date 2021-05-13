@@ -104,3 +104,27 @@ export const angleLeft = (width=13, height=13) => svg`
 export const caretDown = (width=13, height=13) => svg`
   <svg width=${width} height=${height} aria-hidden="true" focusable="false" data-prefix="fas" data-icon="caret-down" class="svg-inline--fa fa-caret-down fa-w-10" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><path fill="currentColor" d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"></path></svg>
 `
+
+export const newBlock = (width=13, height=13) => svg`
+  <svg width=${width} height=${height} aria-hidden="true" focusable="false" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">  
+    <rect style="fill: rgb(255, 255, 255); stroke: rgb(0, 0, 0); stroke-width: 75px;" x="37.689" y="96.902" width="424.622" height="306.197" rx="40" ry="40"/>
+    <line style="stroke: rgb(0, 0, 0); stroke-width: 59px;" x1="250" y1="163.451" x2="250" y2="336.549"/>
+    <line style="stroke: rgb(0, 0, 0); stroke-width: 59px;" x1="150" y1="250" x2="350" y2="250"/>
+  </svg>
+`
+
+export const splitBlock = (width=13, height=13) => svg`
+  <svg width=${width} height=${height} aria-hidden="true" focusable="false" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">  
+    <polyline style="fill: rgb(255, 255, 255); stroke-width: 72px; stroke-linejoin: round; stroke: rgb(0, 0, 0);" points="37.329 0 37.329 190.304 462.671 190.304 462.671 2.5"/>
+    <polyline style="fill: rgb(255, 255, 255); stroke-width: 72px; stroke-linejoin: round; stroke: rgb(0, 0, 0);" points="37.329 311.817 37.329 502.121 462.671 502.121 462.671 314.317" transform="matrix(-1, 0, 0, -1, 499.999969, 813.937988)"/>
+  </svg>
+`
+
+export const deleteBlock = (width=13, height=13) => svg`
+  <svg width=${width} height=${height} aria-hidden="true" focusable="false" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+    <rect style="fill: rgb(255, 255, 255); stroke: rgb(0, 0, 0); stroke-width: 75px;" x="37.689" y="96.902" width="424.622" height="306.197" rx="40" ry="40"/>
+    <rect style="stroke: rgb(0, 0, 0); fill: rgb(255, 255, 255); stroke-width: 0px;" x="217.206" y="175.407" width="289.201" height="274.773"/>
+    <line style="stroke: rgb(0, 0, 0); stroke-width: 50px;" x1="292.107" y1="250.618" x2="432.821" y2="391.332"/>
+    <line style="stroke: rgb(0, 0, 0); stroke-width: 50px;" x1="292.894" y1="250.009" x2="439.618" y2="396.733" transform="matrix(0, 1, -1, 0, 689.627014, -42.88501)"/>
+  </svg>
+`
