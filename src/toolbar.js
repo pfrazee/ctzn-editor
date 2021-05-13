@@ -16,12 +16,14 @@ const CTRL_ICONS = {
   outdent: icons.outdent,
   quote: icons.quote,
   table: icons.table,
+  hr: () => html`<span>&mdash;</span>`,
   removeformat: icons.clearFormatting
 }
 const STATELESS_CTRLS = ['indent', 'outdent', 'removeformat']
 const CTRL_COMMANDS = {
   link: 'mceLink',
-  quote: 'mceBlockQuote'
+  quote: 'mceBlockQuote',
+  hr: 'InsertHorizontalRule'
 }
 const HTML_BLOCK_LABELS = {
   p: 'Paragraph',
@@ -119,6 +121,8 @@ export class CtznEditorToolbar extends LitElement {
           <div class="sep"></div>
           ${btn('quote')}
           ${btn('table')}
+          ${btn('hr')}
+          <div class="sep"></div>
           ${btn('superscript')}
           ${btn('subscript')}
           <div class="sep"></div>

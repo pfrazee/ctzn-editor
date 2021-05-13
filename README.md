@@ -15,9 +15,6 @@ This is a blocks-oriented WYSIWYG editor geared towards building user interfaces
 ## TODOs
 
 - Get TinyMCE working the way we want
-  - Heading/paragraph/blockquote/list buttons
-  - Tables
-  - HRs
   - Style the content
 - Parser needs to support attributes (links)
 - Select blocks
