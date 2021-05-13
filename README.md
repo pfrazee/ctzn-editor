@@ -14,24 +14,19 @@ This is a blocks-oriented WYSIWYG editor geared towards building user interfaces
 
 ## TODOs
 
-- Content
-  - All HTML block types
-    - Table
-  - All HTML inline formatting
-  - All CTZN block types
-  - Handle HTML that's not wrapped at the top level in a block tag
-  - Allow blocks inside blockquote?
-  - Support &lt;kbd&gt;?
-  - Parser handle attributes?
-- Behaviors
-  - Popup/hover UIs for configuring elements
-  - Copy/paste handling
-  - Undo/redo stack
-  - Selecting multiple blocks
-  - Drag & drop to rearrange blocks
-  - Handle up/down keys within multiline block (has &lt;br&gt;s)
-- Various
-  - Mobile
+- Get TinyMCE working the way we want
+  - Heading/paragraph/blockquote/list buttons
+  - Tables
+  - HRs
+  - Style the content
+- Parser needs to support attributes (links)
+- Select blocks
+- Toolbar for non-richtext blocks
+- Block drag & drop to reorder
+- Block create
+- Block delete
+- Richtext split tool (into multiple blocks)
+- Implement all ctzn-* blocks
 
 ## Attributions
 

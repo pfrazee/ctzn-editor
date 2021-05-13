@@ -1,15 +1,17 @@
 import { LitElement, html } from 'lit'
-import { CtznEditorBlockDefinition, fromHTML } from './data-model.js'
-import './blocks/base.js'
-import './blocks/editor.js'
-import './blocks/lists.js'
-import './blocks/hr.js'
+import { repeat } from 'lit/directives/repeat.js'
+import { fromHTML, toHTML } from './data-model.js'
 import './toolbar.js'
+import './blocks/richtext.js'
+import './blocks/unknown.js'
+import './blocks/ctzn-card.js'
+import './blocks/ctzn-code.js'
+import * as icons from './icons.js'
 
 export class CtznEditor extends LitElement {
   static get properties () {
     return {
-      rootBlock: {type: Object},
+      blocks: {type: Object},
       editorState: {type: Object}
     }
   }
@@ -21,32 +23,23 @@ export class CtznEditor extends LitElement {
   constructor () {
     super()
 
-    this.rootBlock = new CtznEditorBlockDefinition({tagName: 'editor', blocks: [
-      new CtznEditorBlockDefinition({tagName: 'p', content: ''})
-    ]})
+    this.blocks = fromHTML('<p></p>')
     this.editorState = {
       appliedStates: {}
     }
   }
 
-  get toolbarEl () {
-    return this.querySelector('ctzn-editor-toolbar')
-  }
-
-  get rootBlockEl () {
-    return this.querySelector('ctzn-editor-block--editor')
-  }
-
   fromHTML (str) {
-    this.rootBlock = fromHTML(str)
+    this.blocks = fromHTML(str)
+    console.log(this.blocks)
   }
 
   toHTML () {
-    return this.rootBlock.toHTML()
+    return toHTML(this.blocks)
   }
 
   toJSON () {
-    return this.rootBlock
+    return this.blocks
   }
 
   // rendering
@@ -54,36 +47,39 @@ export class CtznEditor extends LitElement {
 
   render () {
     return html`
-      <ctzn-editor-toolbar
-        .editorState=${this.editorState}
-        @toolbar-command=${this.onToolbarCommand}
-      ></ctzn-editor-toolbar>
-      <ctzn-editor-block--editor
-        .definition=${this.rootBlock}
-        @state-changed=${this.onEditorStateChanged}
-      ></ctzn-editor-block--editor>
+      <ctzn-editor-toolbar .editorState=${this.editorState}></ctzn-editor-toolbar>
+      <div class="editor-blocks-container" @editor-state-change=${this.onEditorStateChange}>
+        ${repeat(this.blocks, block => block.id, block => html`
+          <div class="block-header">
+            <span class="block-label">
+              ${block.blockType}
+            </span>
+          </div>
+          <div class="block-wrapper">
+            <div class="block-ctrl">
+              <span>${icons.gripVertical(14, 14)}</span>
+            </div>
+            <div class="menu-container"></div>
+            <div class="block">${block.render()}</div>
+          </div>
+        `)}
+      </div>
     `
   }
 
   // events
   // =
 
-  onEditorStateChanged (e) {
-    this.editorState = {
-      currentBlock: this.rootBlockEl.getFocusedBlock()?.definition?.tagName,
-      bold: document.queryCommandState('bold'),
-      italic: document.queryCommandState('italic'),
-      underline: document.queryCommandState('underline'),
-      strikeThrough: document.queryCommandState('strikeThrough'),
-      superscript: document.queryCommandState('superscript'),
-      subscript: document.queryCommandState('subscript')
-    }
+  onEditorStateChange (e) {
+    // console.log(e.detail)
+    this.editorState = e.detail
+    this.editorState.focusedBlock = e.target
   }
 
   onToolbarCommand (e) {
     switch (e.detail.command) {
       case 'indent':
-        let newEvent = new CustomEvent('change-block-indentation', {bubbles: true, detail: {direction: e.detail.direction}})
+        let newEvent = new CustomEvent('change-indentation', {detail: {direction: e.detail.direction}})
         this.rootBlockEl.getFocusedBlock()?.dispatchEvent?.(newEvent)
         break
     }
