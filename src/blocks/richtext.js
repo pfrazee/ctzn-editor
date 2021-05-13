@@ -1,4 +1,5 @@
 import { LitElement, html } from 'lit'
+import * as contextMenu from '../context-menu.js'
 
 export class CtznEditorBlock_Richtext extends LitElement {
   static get properties () {
@@ -24,7 +25,7 @@ export class CtznEditorBlock_Richtext extends LitElement {
       menubar: false,
       statusbar: false,
       toolbar: false,
-      plugins: ['advlist', 'autoresize', 'link', 'lists'],
+      plugins: ['advlist', 'autoresize', 'link', 'lists', 'table'],
       autoresize_bottom_margin: 0,
       content_style: `
       body {
@@ -56,9 +57,11 @@ export class CtznEditorBlock_Richtext extends LitElement {
   }
 
   emitEditorStateChange () {
+    contextMenu.destroy()
     if (!this.editor) return
     const detail = {
       currentBlockType: 'richtext',
+      currentHtmlBlock: getTopmostishHtmlElementTagName(this.editor.selection.getStart()),
       bold: !!this.editor.queryCommandState('Bold'),
       dl: !!this.editor.queryCommandState('InsertDefinitionList'),
       ol: !!this.editor.queryCommandState('InsertOrderedList'),
@@ -83,3 +86,12 @@ export class CtznEditorBlock_Richtext extends LitElement {
   }
 }
 customElements.define('ctzn-editor-block--richtext', CtznEditorBlock_Richtext)
+
+function getTopmostishHtmlElementTagName (node) {
+  if (!node) return ''
+  const topmostishTagNames = ['BODY', 'BLOCKQUOTE']
+  while (node && !topmostishTagNames.includes(node.parentNode?.tagName)) {
+    node = node.parentNode
+  }
+  return node?.tagName.toLowerCase() || ''
+}

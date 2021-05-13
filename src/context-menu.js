@@ -152,7 +152,7 @@ export class ContextMenu extends LitElement {
     if (this.x) style += `left: ${this.x}px; `
     if (this.y) style += `top: ${this.y}px; `
     return html`
-      <div class="context-menu dropdown ${this.hasParent ? 'has-parent' : ''}" style="${style}">
+      <div class="context-menu ${this.hasParent ? 'has-parent' : ''}" style="${style}">
         ${this.customCSS ? html`<style>${this.customCSS}</style>` : ''}
         ${this.customRender
           ? this.customRender.call(this)

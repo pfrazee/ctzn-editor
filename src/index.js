@@ -75,14 +75,5 @@ export class CtznEditor extends LitElement {
     this.editorState = e.detail
     this.editorState.focusedBlock = e.target
   }
-
-  onToolbarCommand (e) {
-    switch (e.detail.command) {
-      case 'indent':
-        let newEvent = new CustomEvent('change-indentation', {detail: {direction: e.detail.direction}})
-        this.rootBlockEl.getFocusedBlock()?.dispatchEvent?.(newEvent)
-        break
-    }
-  }
 }
 customElements.define('ctzn-editor', CtznEditor)
